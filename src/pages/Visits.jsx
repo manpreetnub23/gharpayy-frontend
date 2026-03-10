@@ -4,9 +4,9 @@ import TopBar from "../components/Topbar.jsx";
 import VisitForm from "./VisitForm.jsx";
 
 const outcomeToLeadStatus = {
-	Visited: "Visit",
-	Interested: "Negotiation",
-	"Not Interested": "Contacted",
+	Visited: "Visit Completed",
+	Interested: "Property Suggested",
+	"Not Interested": "Lost",
 };
 
 const outcomeConfig = {
@@ -67,22 +67,15 @@ const Visits = () => {
 		}
 	};
 
-	// ✅ Only change: also update lead status when outcome is recorded
-	const handleOutcomeChange = async (visitId, outcome, leadId) => {
+	const handleOutcomeChange = async (visitId, outcome) => {
 		setOutcomes((prev) => ({ ...prev, [visitId]: outcome }));
 		try {
-			await updateVisit(visitId, { outcome });
-
-			if (leadId && outcomeToLeadStatus[outcome]) {
-				await updateLead(leadId, { status: outcomeToLeadStatus[outcome] });
-			}
-
+			await updateVisit(visitId, { outcome }); // backend handles lead sync
 			fetchVisits();
 		} catch (err) {
 			console.error(err);
 		}
 	};
-
 	const upcoming = visits.filter((v) => !v.outcome);
 	const completed = visits.filter((v) => v.outcome);
 
